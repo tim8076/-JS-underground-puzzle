@@ -2,6 +2,7 @@ const puzzleContainer = document.querySelector('[data-puzzle-container]');
 const puzzleCards = document.querySelectorAll('.puzzle-card');
 const gridItems = document.querySelectorAll('.grid-item');
 const resetButton = document.querySelector('[data-reset-button]');
+const answer = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 
 function randomIntFromInterval(min, max) { // min and max included 
@@ -42,12 +43,33 @@ gridItems.forEach((item) => {
   item.addEventListener('drop', (e) => {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+    const dataNum = Number(data.num);
     puzzleCards.forEach((card) => {
-      if (card.dataset.num === data.num) {
+      const cardNum = Number(card.dataset.num);
+      if (cardNum === 2 || cardNum === 6 || cardNum === 8) card.classList.add('left');
+      if (cardNum === 5 || cardNum === 7 || cardNum === 9) card.classList.add('top');
+      if (cardNum === dataNum) {
         card.classList.add('inBox');
         item.appendChild(card);
       }
     })
+  })
+})
+
+
+puzzleContainer.addEventListener('dragover', (e) => {
+  e.preventDefault();
+})
+puzzleContainer.addEventListener('drop', (e) => {
+  e.preventDefault();
+  const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+  const dataNum = Number(data.num);
+  puzzleCards.forEach((card) => {
+    const cardNum = Number(card.dataset.num);
+    if (cardNum === dataNum) {
+      card.classList = 'puzzle-card'
+      puzzleContainer.appendChild(card);
+    }
   })
 })
 
