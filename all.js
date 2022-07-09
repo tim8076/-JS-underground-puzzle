@@ -34,6 +34,9 @@ puzzleCards.forEach((card) => {
   })
 });
 
+document.addEventListener('drag', (e) => {
+  console.log(e);
+})
 
 gridItems.forEach((item) => {
   item.addEventListener('dragover', (e) => {
@@ -42,8 +45,12 @@ gridItems.forEach((item) => {
   item.addEventListener('drop', (e) => {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+    const dataNum = Number(data.num);
     puzzleCards.forEach((card) => {
-      if (card.dataset.num === data.num) {
+      const cardNum = Number(card.dataset.num);
+      if (cardNum === 2 || cardNum === 6 || cardNum === 8) card.classList.add('left');
+      if (cardNum === 5 || cardNum === 7 || cardNum === 9) card.classList.add('top');
+      if (cardNum === dataNum) {
         card.classList.add('inBox');
         item.appendChild(card);
       }
@@ -51,6 +58,30 @@ gridItems.forEach((item) => {
   })
 })
 
+<<<<<<< HEAD
+=======
+puzzleContainer.addEventListener('dragover', (e) => {
+  e.preventDefault();
+})
+
+puzzleContainer.addEventListener('drop', (e) => {
+  e.preventDefault();
+  if (e.target.className !== 'puzzle-container') return;
+  const { offsetX, offsetY } = e;
+  console.log(e)
+  const { offsetWidth, offsetHeight } = e.target;
+  const ratioX = Math.round(offsetX / offsetWidth * 100);
+  const ratioY = Math.round(offsetY / offsetHeight * 100);
+  const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+  const card = [...puzzleCards].find((card) => card.dataset.num === data.num)
+  card.className = 'puzzle-card';
+  card.style.setProperty('--top', ratioY);
+  card.style.setProperty('--left', ratioX);
+  puzzleContainer.appendChild(card);
+})
+
+
+>>>>>>> origin/main
 
 resetButton.addEventListener('click', () => {
   placeCards();

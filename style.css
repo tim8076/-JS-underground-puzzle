@@ -74,11 +74,20 @@ h1 {
 	top: calc(var(--top) * 1%);
 	left: calc(var(--left) * 1%);
 	user-select: none;
+  z-index: 10;
 }
 
 .puzzle-card.inBox {
 	top: 0;
 	left: 0;
+}
+
+.puzzle-card.inBox.left {
+  left: -28px;
+}
+
+.puzzle-card.inBox.top {
+  top: -28px;
 }
 
 .resetButton {
