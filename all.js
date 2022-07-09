@@ -2,6 +2,7 @@ const puzzleContainer = document.querySelector('[data-puzzle-container]');
 const puzzleCards = document.querySelectorAll('.puzzle-card');
 const gridItems = document.querySelectorAll('.grid-item');
 const resetButton = document.querySelector('[data-reset-button]');
+const answer = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 
 function randomIntFromInterval(min, max) { // min and max included 
@@ -58,8 +59,6 @@ gridItems.forEach((item) => {
   })
 })
 
-<<<<<<< HEAD
-=======
 puzzleContainer.addEventListener('dragover', (e) => {
   e.preventDefault();
 })
@@ -79,9 +78,6 @@ puzzleContainer.addEventListener('drop', (e) => {
   card.style.setProperty('--left', ratioX);
   puzzleContainer.appendChild(card);
 })
-
-
->>>>>>> origin/main
 
 resetButton.addEventListener('click', () => {
   placeCards();
