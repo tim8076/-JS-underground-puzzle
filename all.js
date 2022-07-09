@@ -1,28 +1,37 @@
 const puzzleContainer = document.querySelector('[data-puzzle-container]');
+const puzzleGrid = document.querySelector('[data-puzzle-grid]')
 const puzzleCards = document.querySelectorAll('.puzzle-card');
 const gridItems = document.querySelectorAll('.grid-item');
 const resetButton = document.querySelector('[data-reset-button]');
-const answer = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-
-function randomIntFromInterval(min, max) { // min and max included 
+function randomIntFromInterval(min, max) {  // min and max included 
   return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
 function placeCards() {
+  gridItems.forEach((grid) => {
+    if (grid.hasChildNodes()) {
+      grid.firstChild.className = 'puzzle-card';
+      puzzleContainer.appendChild(grid.firstChild);
+    }
+  });
+
   puzzleCards.forEach((card) => {
     const top = randomIntFromInterval(0, 80);
     const left = randomIntFromInterval(-10, 10);
     const right = randomIntFromInterval(70, 90);
     const isLeft = randomIntFromInterval(0, 1);
     if (isLeft) {
-      card.style.setProperty('--top', top);
-      card.style.setProperty('--left', left);
+      setCardPosition({ card, top, pos: left });
     } else {
-      card.style.setProperty('--top', top);
-      card.style.setProperty('--left', right);
+      setCardPosition({ card, top, pos: right });
     }
   })
+}
+
+function setCardPosition({ card, top, pos }) {
+  card.style.setProperty('--top', top);
+  card.style.setProperty('--left', pos);
 }
 
 puzzleCards.forEach((card) => {
@@ -30,21 +39,27 @@ puzzleCards.forEach((card) => {
     const data = {
       src: e.target.src,
       num: e.target.dataset.num,
+      cardHeight: e.target.clientHeight,
+      cardWidth: e.target.clientWidth,
     }
     e.dataTransfer.setData('text/plain', JSON.stringify(data));
   })
 });
 
-document.addEventListener('drag', (e) => {
-  console.log(e);
-})
-
 gridItems.forEach((item) => {
   item.addEventListener('dragover', (e) => {
     e.preventDefault();
   })
+  item.addEventListener('dragenter', (e) => {
+    item.classList.add('card-hover');
+  })
+  item.addEventListener('dragleave', (e) => {
+    item.classList.remove('card-hover');
+  })
   item.addEventListener('drop', (e) => {
     e.preventDefault();
+    item.classList.remove('card-hover');
+    if (item.hasChildNodes()) return;
     const data = JSON.parse(e.dataTransfer.getData("text/plain"));
     const dataNum = Number(data.num);
     puzzleCards.forEach((card) => {
@@ -54,10 +69,17 @@ gridItems.forEach((item) => {
       if (cardNum === dataNum) {
         card.classList.add('inBox');
         item.appendChild(card);
+        checkWin();
       }
     })
   })
 })
+
+function checkWin() {
+  const cards = [ ...gridItems].map((grid) => grid.firstChild);
+  if (cards.includes(null)) return;
+  return cards.every((card, index) => Number(card.dataset.num) === index + 1);
+}
 
 puzzleContainer.addEventListener('dragover', (e) => {
   e.preventDefault();
@@ -66,16 +88,15 @@ puzzleContainer.addEventListener('dragover', (e) => {
 puzzleContainer.addEventListener('drop', (e) => {
   e.preventDefault();
   if (e.target.className !== 'puzzle-container') return;
-  const { offsetX, offsetY } = e;
-  console.log(e)
-  const { offsetWidth, offsetHeight } = e.target;
-  const ratioX = Math.round(offsetX / offsetWidth * 100);
-  const ratioY = Math.round(offsetY / offsetHeight * 100);
   const data = JSON.parse(e.dataTransfer.getData("text/plain"));
-  const card = [...puzzleCards].find((card) => card.dataset.num === data.num)
+  const { offsetX, offsetY } = e;
+  const { offsetWidth, offsetHeight } = e.target;
+  const { cardHeight, cardWidth, num } = data;
+  const ratioX = Math.round((offsetX - cardWidth / 2) / offsetWidth * 100);
+  const ratioY = Math.round((offsetY - cardHeight / 2 ) / offsetHeight * 100);
+  const card = [...puzzleCards].find((card) => card.dataset.num === num);
   card.className = 'puzzle-card';
-  card.style.setProperty('--top', ratioY);
-  card.style.setProperty('--left', ratioX);
+  setCardPosition({ card, top: ratioY, pos: ratioX });
   puzzleContainer.appendChild(card);
 })
 
